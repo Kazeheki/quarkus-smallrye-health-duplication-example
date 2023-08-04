@@ -34,6 +34,7 @@ Once everything is up and running, visit `http://localhost:18080/q/health`.
 You can see the duplication in checks.
 
 To see the difference to dev-mode, do the following:
+- `cd check-duplication-example`
 - start `./mvnw quarkus:dev`
 - open `http://localhost:8080/q/health`
 
