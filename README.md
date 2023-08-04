@@ -19,6 +19,9 @@ The health check seems to duplicate the checks.
 This is no duplication in logging but rather a duplication in calling the check twice
 (see [comment in issue](https://github.com/quarkusio/quarkus/issues/32800#issuecomment-1593879727)).
 
+The problem only started to occur as soon as I added the liveness/readiness probes
+on the k8s deployment configuration.
+
 ## See the problem in action with this example.
 
 Run `./start` script.
