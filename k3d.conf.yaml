@@ -1,0 +1,19 @@
+kind: Simple
+apiVersion: k3d.io/v1alpha5
+metadata:
+  name: duplication-example
+image: rancher/k3s:v1.26.0-k3s1
+
+servers: 1
+agents: 1
+
+ports:
+  - port: 18080:80
+    nodeFilters:
+      - loadbalancer
+
+registries:
+  create:
+    name: cluster-registry
+    host: "0.0.0.0"
+    hostPort: "15000"

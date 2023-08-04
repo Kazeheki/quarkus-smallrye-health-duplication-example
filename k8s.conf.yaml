@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: example
+  name: example
+  labels:
+    app: example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example
+  template:
+    metadata:
+      name: example
+      labels:
+        app: example
+    spec:
+      containers:
+        - name: example
+          image: cluster-registry:15000/duplication-example:latest
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: example
+  name: example
+spec:
+  selector:
+    app: example
+  ports:
+    - port: 80
+      name: http
+      targetPort: 8080
+      protocol: TCP
+  type: NodePort
+
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: example
+  name: example
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: example
+                port:
+                  name: http

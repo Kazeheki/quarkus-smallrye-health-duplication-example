@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+_=$(k3d cluster list | grep "duplication-example")
+RESULT=$?
+if [ $RESULT -eq 0 ]; then
+  k3d cluster delete duplication-example
+fi
+
+echo
+echo "=== DONE CLEANUP ==="
+echo

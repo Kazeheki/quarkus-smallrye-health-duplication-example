@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+set -e
+
+needed_tools=()
+
+if ! [ -x "$(command -v k3d)" ]; then
+  needed_tools+=("k3d")
+fi
+if ! [ -x "$(command -v docker)" ]; then
+  needed_tools+=("docker")
+fi
+if ! [ -x "$(command -v kubectl)" ]; then
+  needed_tools+=("kubectl")
+fi
+
+if [ ${#needed_tools[@]} != 0 ]; then
+  echo "The following tools are missing:"
+  for item in "${needed_tools[@]}"; do
+    echo "${item}"
+  done
+  exit 1
+fi
+
+IMAGE_NAME=duplication-example
+
+function setup_cluster {
+  k3d cluster create --config k3d.conf.yaml
+  kubectl config use-context k3d-duplication-example
+  kubectl create namespace example
+}
+
+function build_and_push_image {
+  local REGISTRY="localhost:15000"
+  local PROJECT_ROOT=./check-duplication-example
+
+  local CURRDIR
+  CURRDIR=$(pwd)
+  cd "${PROJECT_ROOT}" || exit 1
+  ./mvnw clean package -DskipTests
+  cd "${CURRDIR}" || exit 1
+
+  local IMAGE="${REGISTRY}/${IMAGE_NAME}:latest"
+  docker build -f ./check-duplication-example/src/main/docker/Dockerfile.jvm "${PROJECT_ROOT}" -t "${IMAGE}"
+
+  docker push "${IMAGE}"
+}
+
+function deploy {
+  kubectl apply -f k8s.conf.yaml
+}
+
+########
+# MAIN #
+########
+
+setup_cluster
+build_and_push_image
+deploy
+
+echo
+echo "=== DONE SETUP ==="
+echo
