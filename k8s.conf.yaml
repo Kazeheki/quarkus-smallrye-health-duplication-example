@@ -20,6 +20,28 @@ spec:
         - name: example
           image: cluster-registry:15000/duplication-example:latest
           imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /q/health/ready
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 6
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /q/health/live
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 6
+            successThreshold: 1
+            timeoutSeconds: 1
       restartPolicy: Always
 
 ---
